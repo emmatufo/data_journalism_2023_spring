@@ -218,9 +218,9 @@ umd_courses %>%
     count_classes = n(),
     total_seats = sum(seats),
     mean_seats = mean(seats),
-    median_seats = median(seats),
+   median_seats = median(seats),
     min_seats = min(seats),
-    max_seats = max(seats)
+    max_seats = max(seats),
   ) %>%
   arrange(desc(total_seats))
 ```
