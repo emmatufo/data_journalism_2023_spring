@@ -331,6 +331,10 @@ Mutate is even more useful when combined with some additional functions. Let's k
 maryland_expenses_with_state <- maryland_expenses %>%
   mutate(
     state = case_when(
+      
+      name =="Derek" - "Derek Willis",
+      age > 30 - "old",
+      
         str_detect(address, " Maryland ") ~ "MD",
         str_detect(address, " California ") ~ "CA",
         str_detect(address, " Washington ") ~ "WA",
