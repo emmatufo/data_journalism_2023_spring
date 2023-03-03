@@ -1,0 +1,137 @@
+---
+title: "lab_05"
+author: "Derek Willis"
+date: "2023-01-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About this lab
+
+To complete this lab, you need to: \* run existing code as directed (look for **Task**). \* modify existing code as directed (look for **Task**). \* write code in empty codeblocks provided to answer questions included (look for **Q**). \* write out the answer in the form of a complete sentence in the space given (look for **A**). Read the questions carefully and attempt to do all of what they ask. Make a list if it helps.
+
+When you are finished, commit changes and push to your personal GitHub repo, then submit the URL to this document on ELMS.
+
+## Load libraries and establish settings
+
+You'll need to load three packages for this: the tidyverse, lubridate and janitor.
+
+**Task** load these three packages.
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+library(janitor)
+library(tidyverse)
+library(lubridate)
+library(refinr)
+library(dplyr)
+```
+
+For this lab, we want to investigate spending by Maryland state and local candidates during the 2022 election. For example, we could ask how much money have candidates and committees spent on advertising on Facebook? Which vendors received the most money for media expenses? We have the data, but it's messy - names of payees are spelled differently and capitalized differently - and we need to clean it up. We'll use a combination of RStudio and OpenRefine to do that.
+
+The basic process here is to start in RStudio, export data so that we can use OpenRefine to clean it up, and then bring it back into RStudio to finish our analysis. The function to export data from RStudio is called `write_csv()` and it takes two arguments: the name of the dataframe and the path of the file to write it to, which is in quotes. Like `read_csv()`, but the variable name comes inside. Here's an example, in which you'd replace the dataframe and the path values.
+
+```{r}
+write_csv(dataframe, "folder/file.csv")
+```
+
+
+## Load Data
+
+You'll need to load one data set, a CSV file of Maryland campaign expenditures located in the data folder called "maryland_expenses.csv"
+
+**Task** Create a codeblock below, then read the data in and assign it to an appropriate variable name. You'll want to clean up the column names and make sure that any date columns are actually date datatypes.
+
+```{r}
+# Load the Maryland expenditures data table, clean the column names and convert columns with dates into actual dates.
+maryland_expenses <- read_csv("data/maryland_expenses.csv") %>%
+  clean_names()
+```
+
+## Answer questions
+
+**Q1.** You've been assigned to write about Maryland political committees' use of Facebook advertising. There's a category column in the data that has values for different kinds of spending. One of them is "Media". Write code to isolate Media expenses where the name of the payee is not NA. Then, using the `write_csv` function, make a CSV file of those media expenses in your data folder. Using OpenRefine, create a project using that CSV file, create a copy of the `payee_name` column called `payee_clean` and then standardize it, focusing your work on the payees that appear most often. Pay particular attention to variations of Facebook, bearing in mind that it changed its name in 2021: https://about.fb.com/news/2021/10/facebook-company-is-now-meta/).
+
+Then, when you are done standardizing `payee_clean`, export it as a new CSV file to your data folder, *giving that file a different name* and read it back into RStudio as a new dataframe.
+
+Then, using that `payee_clean` column, write code to find all of the spending where Facebook is the payee and calculate the total amount of spending for each committee and present the results showing the committee that spent the most first. Which committee is that?
+
+**A1.WFP National Pac - Non-Contribution Account**
+
+```{r}
+media_expenses <- maryland_expenses
+write_csv(media_expenses, "data/media_expenses.csv")
+```
+```{r}
+cleaned_media_expenses<- media_expenses %>%
+  mutate(payee_clean=key_collision_merge(payee_name)) %>%
+  select(payee_name, payee_clean, everything())
+```  
+
+
+```{r}
+cleaned_media_expenses %>%
+  filter(str_detect(payee_clean, 'Facebook')) %>%
+  group_by(payee_clean, committee_name, amount) %>%
+  summarise(
+    count=n()
+  ) %>%
+arrange(desc(amount))
+ 
+```
+
+
+
+# isolate rows where the name is not NA
+
+```{r}
+cleaned_media_expenses %>%
+  filter(str_detect(expense_category, "Media"| payee_name != "NA")) %>%
+write_csv(cleaned_media_expenses, "data/media_expenses.csv")
+```
+i was trying to do this part but it wasn't working for me! i understand the idea and everything but yeah
+
+
+
+**Q2.** Let's do some research on the top committees from question 1. Look up the top 10 spenders: if they are candidate committees, what offices were they running for? If they were not candidates, what issues do they seem to care about? Write some sentences answering those questions, then go the Facebook ad library (https://www.facebook.com/ads/library/?active_status=all&ad_type=political_and_issue_ads&country=US&sort_data\[direction\]=desc&sort_data\[mode\]=relevancy_monthly_grouped&media_type=all) and look for ads from the top spender. What do you notice about those ads?
+
+**A2. The WFP National Pac is the top spender, they are a party that cares about equality for the working class and everyone in the US, basically the unity of workers in a divide created by bosses, or the rich. Another top spender,CASA in action, cares about mobilizing voters to elect leaders supporting immigrants and communities of color. The ads are all about their endorsements for Congress. I noticed a lot of women were being endorsed. Also some of the ads are a 'Would you rather' ordeal saying what other people are fighting for compared to them.** 
+
+**Q3.** Given the list of top spenders in A1 and the primary results for governor (https://elections.maryland.gov/elections/2022/primary_results/gen_results_2022_1.html), who is missing from that A1 list? Did those campaigns run Facebook ads, according to Facebook's ad library? Who are the biggest recipients of media expenses by the Democratic primary winner for governor (HINT: that person has two committees)?
+
+**A3. I'm confused by this question. Wes Moore is the democratic winner for governor, but below isn't working.** 
+
+```{r}
+leaned_media_expenses %>%
+  filter(str_detect(payee_clean, 'Wes Moore')) %>%
+  group_by(payee_clean, committee_name, amount, expense_purpose) %>%
+  summarise(
+    count=n()
+  ) %>%
+arrange(desc(amount))
+```
+
+**Q4.** The media expense data you cleaned also has a standardized purpose column. Write code to generate a list of the committees with the total amount of spending on online advertising. How does this list compare to the one from Q1 about top Facebook spenders? Of the top 5 committees who spent the most on Facebook ads from Q1, are there any that appear to have spent *all* of their online advertising dollars on Facebook?
+
+**A4.The top 10 spenders using facebook, also had the expense purpose of online adverting. WFP National PAC seems to have spent all of their online advertising dollars on facebook. ** 
+
+```{r}
+cleaned_media_expenses %>%
+  filter(str_detect(expense_purpose, 'Online Advertising')) %>%
+  filter(str_detect(payee_clean, 'Facebook')) %>%
+  group_by(payee_clean, committee_name, amount, expense_purpose) %>%
+  summarise(
+    count=n()
+  ) %>%
+arrange(desc(amount))
+ 
+  
+```
+
+**Q5** You've been asked to summarize your findings about spending on Facebook by Maryland political candidates. How much do we know and what don't we know? What's the best story idea you've found here?
+
+**A5 I feel like it would be helpful for stories to know exactly who was being endorsed. A good story would be to find out if these companies that spent so much on facebook were actually successful in the end. Facebook isn't really a prominent social media site today as much as others, so it's interesting why so much money is being put into using it for political gain. **
