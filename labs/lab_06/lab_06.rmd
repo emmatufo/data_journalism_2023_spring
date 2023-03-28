@@ -126,7 +126,7 @@ group_by(pct_under_18, zip_code, population) %>%
 
 Q4. Choose your own adventure: I want you to come up with a question you could ask of the Baltimore City data that combines both the calls and the demographic information. You must use both demographics and the overdose call data in your work.
 
-Which neighborhood with a percentage of White people at at least 80% has the most calls
+Which neighborhood with a percentage of White people at at least 60% has the most calls
 I was curious because of the previous question regarding zip codes. When looking it up i found a lot of them weren't great areas safety-wise. I'm curious if the neighborhoods with different ethnicity populations have different results. When doing research for previous question, google told me most of them were Highly populated by African Americans. Just curious if there's a difference.
 
 A4: for some reason no matter what i did this wasn't running. didn't say error or anything
