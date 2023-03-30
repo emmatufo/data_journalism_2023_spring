@@ -67,10 +67,10 @@ arrange(desc(estimate))
 
 
 **Q2** Which Maryland counties have a median age of at least 50? You can use the dataframe you just made to answer this, but you must write code to display only those counties with a median age of at least 50. 
-**A2** 
+**A2 All. have a median age of at least 50 expcept for Worcester and Talbot.** 
 
 ```{r}
-med <- med %>%
+med_atleast50 <- med %>%
 filter(estimate <= 50)
 ```
 
