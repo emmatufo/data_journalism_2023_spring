@@ -1,0 +1,70 @@
+---
+title: "data_analysis"
+author: "Emma Tufo"
+date: "2022-04-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+library(tidyverse)
+library(janitor)
+library(tidycensus)
+library(ggthemes)
+```
+
+```{r}
+md_foreclosure_data <- read_csv("~/Documents/data_journalism_2023_spring/major_assignments/data_analysis/data/Maryland_Notices_of_Intent_to_Foreclose_by_Zip_Code.csv")
+```
+
+data cleaning ideas
+- finding census data that matches cities to zipcodes and joining it so we can have a city column
+- see which month has the most foreclosures overall
+- do outside research about that time of year
+- find month with highest percentage of total foreclosures in 2022 because we have all the data
+
+```{r}
+md_foreclosure_data %>% 
+  
+```
+
+Question 1: Where are there more foreclosures? Why? 
+This is newsworthy because it would give insight into locations that experience higher numbers of debt, allowing a conclusion to be made about the area’s economic state.
+- it would help to have cities for this one to generalize the count
+
+Question 2: When were there the fewest or most foreclosures? Why?
+This would likely indicate a change due to COVID, but I’m not sure whether that change would add more foreclosures or fewer due to the rent extensions the government allowed in the early days of the pandemic.
+- not sure how to organize columns in a way that allows easy grouping
+
+Question 3: What are the income levels for the most and least foreclosed-upon areas and what does the distribution of that look like?
+This would show us how the value of homes and the income of people purchasing them differs in different income brackets.
+- outside research
+
+Question 4: What does the racial demographic data look like in the areas of interest?
+This is newsworthy because it would give us hard data on any disparities that might exist while comparing the income levels, foreclosure rate, and predominant races being foreclosed on.
+- voter, census, or background research to find percentages
+
+Question 5: How long were people living there before they were foreclosed on? 
+I don’t know whether this data is provided but it would be interesting and would allow us to see the frequency of turnover. If we could compare the buying and selling frequency of highly foreclosed areas to that of infrequently foreclosed areas, it would add a new depth to our research. 
+- census stuff!
+  option 1: "B07001_017 Estimate!!Total:!!Same house 1 year ago: GEOGRAPHICAL MOBILITY IN THE PAST YEAR BY AGE FOR CURRENT RESIDENCE IN THE UNITED STATES"
+  Option 2: "B07001_033 Estimate!!Total:!!Moved within same county: GEOGRAPHICAL MOBILITY IN THE PAST YEAR BY AGE FO"
+  Option 3: "B07001_049 Estimate!!Total:!!Moved from different county within same state: GEOGRAPHICAL MOBILITY IN THE PAST YEAR BY AGE FOR CURRENT RESIDENCE IN THE UNITED STATES"
+  Option 4: "B07001_065 Estimate!!Total:!!Moved from different state: GEOGRAPHICAL MOBILITY IN THE PAST YEAR BY AGE FOR CURRENT RESIDENCE IN THE UNITED STATES" 
+  Option 5: "B07001_081 Estimate!!Total:!!Moved from abroad: GEOGRAPHICAL MOBILITY IN THE PAST YEAR BY AGE FOR"
+  Option 6: "B07003_001 Estimate!!Total: GEOGRAPHICAL MOBILITY IN THE PAST YEAR BY SEX FOR CURRENT RESIDENCE IN THE UNITED STATES"
+
+We think the idea is to load that data and do some adding to find the number of people who've moved away from their houses in that time, but we're not sure how to approach that or whether that's a good idea. We'd love to talk to you in or after class on Tuesday to discuss ideas.
+
+```{r}
+census_api_key("577bf4d5bf135998c07189afd7dc2e2d621240d6", install = TRUE)
+ACS5 <- load_variables(2021, "acs5", cache = TRUE) 
+```
