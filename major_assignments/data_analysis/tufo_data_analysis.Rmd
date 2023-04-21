@@ -32,13 +32,30 @@ data cleaning ideas
 - find month with highest percentage of total foreclosures in 2022 because we have all the data
 
 ```{r}
-md_foreclosure_data %>% 
-  
+md_foreclosure_data
 ```
 
 Question 1: Where are there more foreclosures? Why? 
+
+Answer: 20772 has the highest number of foreclosures for 2022
+
+will use datawrapper for this
+
+** FOR 2022 FEBRUARY IS MISSING
+
 This is newsworthy because it would give insight into locations that experience higher numbers of debt, allowing a conclusion to be made about the area’s economic state.
 - it would help to have cities for this one to generalize the count
+
+```{r}
+md_foreclosure_data_wzip <- md_foreclosure_data %>% 
+  group_by(Zip) %>% 
+  mutate(Zip_total = `March 2022` + `April 2022` + `May 2022` + `June 2022`+ `July 2022` + `August 2022` + `September 2022` + `October 2022` + `November 2022` + `December 2022` + `January 2022` + `February 2020`) %>%
+  arrange(desc(Zip_total))
+
+write.csv(md_foreclosure_data_wzip, file='data/md_foreclosure_data_wzip.csv')
+
+  
+```
 
 Question 2: When were there the fewest or most foreclosures? Why?
 This would likely indicate a change due to COVID, but I’m not sure whether that change would add more foreclosures or fewer due to the rent extensions the government allowed in the early days of the pandemic.
@@ -47,6 +64,8 @@ This would likely indicate a change due to COVID, but I’m not sure whether tha
 Question 3: What are the income levels for the most and least foreclosed-upon areas and what does the distribution of that look like?
 This would show us how the value of homes and the income of people purchasing them differs in different income brackets.
 - outside research
+ff
+
 
 Question 4: What does the racial demographic data look like in the areas of interest?
 This is newsworthy because it would give us hard data on any disparities that might exist while comparing the income levels, foreclosure rate, and predominant races being foreclosed on.
