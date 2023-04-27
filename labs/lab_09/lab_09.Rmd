@@ -48,7 +48,7 @@ mutate(GEOID = as.character(GEOID))
 md_gov_county_18 <- read_csv("data/md_gov_county_18.csv")%>%
 mutate(GEOID = as.character(GEOID))
 
-md_gov_county22_with_18 <- md_gov_county %>% left_join(md_gov_county_18, by="GEOID", "County") 
+md_gov_county22_with_18 <- md_gov_county %>%left_join(md_gov_county_18, by="GEOID", "County") 
 
 md_gov_county22_with_18 <- md_gov_county22_with_18 %>%
   mutate(total_votes_18 = Cox + Moore + Lashar + Wallace + Harding + Sefcik + `Write-ins.x`) %>%

@@ -104,7 +104,8 @@ cardin_url <- "https://www.cardin.senate.gov/?post_type=press-releases"
 date_result <- cardin_url %>%
   read_html() %>%
   html_elements('h5.customBlog_item__date') %>% html_text() %>% as_tibble() %>%
-  rename(date = value ) 
+  rename(date = value ) %>%
+    mutate(date = mdy(date))
 
 title_result<- cardin_url %>%
   read_html ()%>%
