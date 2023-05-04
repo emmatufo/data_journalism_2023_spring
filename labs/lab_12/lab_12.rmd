@@ -1,0 +1,122 @@
+---
+title: "lab_12"
+author: "derek willis"
+date: "2023-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* tidytext and our usual libraries
+
+
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(janitor)
+library(lubridate)
+library(rvest)
+```
+## Questions
+
+**Q1.** You've been assigned to report a story about the leading reasons that Maryland attorneys get sanctioned by the state for misconduct. The state [publishes lists of sanctions](https://www.courts.state.md.us/attygrievance/sanctions) that contain a short text description about the situation. Load the CSV file in the data folder containing records from fiscal year 2011 onwards. Make a list of unique words from the text column, then following the example in the pre_lab, remove common "stop words" from that list and create a list of the top 10 words containing the percentage of occurrences each word represents. What's the leading word in that answer and, broadly, what do you think the top 10 words describe?
+
+**A1. I think that the top 10 words describe there's a pattern yearly of accounts failing based on bad conduct or something like that. The leading word is failing which is quite alrming, but it's news. ** 
+
+```{r}
+md_attorney_sanctions <- read_csv("data/md_attorney_sanctions.csv")
+
+unique_words <- md_attorney_sanctions %>% select(text) %>%
+  unnest_tokens(word, text)
+
+unique_words %>%
+  count(word, sort = TRUE) %>%
+  top_n(25) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip() +
+      labs(x = "Count",
+      y = "Unique words",
+      title = "Count of unique words found in MD Attorney Sanctions")
+
+data("stop_words")
+
+stop_words <- stop_words %>%
+  add_row(word = "attorney") %>% 
+  add_row(word = "attorneys") %>% 
+  add_row(word = "attorney's") %>%
+  add_row(word = "client") %>%
+  add_row(word = "maryland") %>%
+  add_row(word = 'federal') %>% 
+  add_row(word = 'md') %>% 
+  add_row(word = "state") %>% 
+  add_row(word = "engaged") %>% 
+  add_row(word = "law")
+
+
+unique_words %>%
+  anti_join(stop_words) %>%
+  group_by(word) %>%
+  tally(sort=TRUE) %>%
+  mutate(percent = (n/sum(n))*100) %>%
+  top_n(10)
+```
+
+**Q2.** Let's move beyond single words to phrases. Make a list of the top 10 three-word phrases, called trigrams, based on the example from the pre_lab (you'll need to modify the example code to do this). What's the top trigram and how often does it appear? What does that phrase mean in legal terms?
+
+**A2. The top trigrams are conduct involving dishonesty and honesty fraud deceit. In legal terms, this means "a deliberate act or failure to act with the intention of obtaining an unauthorized benefit," according to NMSU. ** 
+
+```{r}
+md_attorney_sanctions_tri <- md_attorney_sanctions %>%
+  unnest_tokens(trigram, text, token = "ngrams", n = 3) %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word) %>%
+  mutate(trigram = paste(word1, word2, word3, sep=" ")) %>%
+  group_by(trigram) %>%
+  tally(sort=TRUE) %>%
+  mutate(percent = (n/sum(n))*100) %>%
+  top_n(10)
+```
+
+**Q3.** Let's drop back down to more traditional text analysis - take the top trigram from Q2 and write code to see how many times it occurs in the text column in each fiscal year. What do you think the answer produced by your code suggests? What else could you do to try and clarify the most important reasons attorneys get sanctioned?
+
+**A3. The answer produced by my code suggests that over time, a lot more attorneys have gotten sanctioned due to conduct involving dishonesty and hishonesty fraud deceit. From 2017 to now with both, there has been a huge jump in attorneys getting sanctioned for both reasons. The increase in deceitful and fraudulent doings within past years is interesting. When I read https://www.courts.state.md.us/sites/default/files/import/attygrievance/pdfs/sanctionsfy23.pdf, there's a lot about attorneys failing to do things, saying they did something for their client when they really didn't and even entering into business contracts with clients when that's not allowed (Wendy Arlene Hausmann) as it results in a conflict of interest. This case clarifies the most important reasons attorneys get sanctioned, decribing how Hausmann was decitful, giving money to a club whom she had represented multiple times and was currently. A complete conflict of interest and dishonesty is what led to her sanction - simply not following the basic rules a lawyer must follow.  ** 
+
+```{r}
+
+md_attorney_sanctions %>%
+  unnest_tokens(trigram, text, token = "ngrams", n = 3) %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word) %>%
+  mutate(trigram = paste(word1, word2, word3, sep=" ")) %>%
+  group_by(trigram, fiscal_year) %>%
+  tally(sort=TRUE) %>%
+  filter(trigram == "conduct involving dishonesty")
+  
+md_attorney_sanctions %>%
+  unnest_tokens(trigram, text, token = "ngrams", n = 3) %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word) %>%
+  mutate(trigram = paste(word1, word2, word3, sep=" ")) %>%
+  group_by(trigram, fiscal_year) %>%
+  tally(sort=TRUE) %>%
+  filter(trigram == "dishonesty fraud deceit")
+
+```
